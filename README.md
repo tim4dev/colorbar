@@ -5,8 +5,8 @@
 
 A simple color choice for your e-commerce store client. Written in Kotlin.
 
-  - `minSdkVersion 16`
-  - AndroidX
+ - `minSdkVersion 16`
+ - AndroidX
 
 ![Color Bar in Action (picture).](https://res.cloudinary.com/ddhl2pupw/image/upload/v1571678573/library-colorbar/colorbar_1.png)
 
@@ -21,18 +21,9 @@ A simple color choice for your e-commerce store client. Written in Kotlin.
     	}
     }
 
-
-    android {
-        defaultConfig {
-            vectorDrawables.useSupportLibrary = true
-        }
-    }
-    
     dependencies {
-        implementation "com.github.tim4dev:colorbar:<version>"
+        implementation "com.github.tim4dev:colorbar:VERSION"
     }    
-            
-    
     
 
 # Usage
@@ -72,6 +63,11 @@ A simple color choice for your e-commerce store client. Written in Kotlin.
     colors.add(new ColorCircleData(Color.parseColor("red"), true));
     colors.add(new ColorCircleData(Color.parseColor("yellow")));
     colorBar.drawColorBar(colors, colorData -> Log.d(TAG, "onClickEvent. data = " + colorData.toString()));
+    
+# See also
+
+[A simple text choice for your e-commerce store client. Written in Kotlin.](https://github.com/tim4dev/textbar)
+    
 
 # License
 
