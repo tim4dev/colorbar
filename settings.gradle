@@ -1,0 +1,2 @@
+include ':app', ':colorbar'
+rootProject.name='Color Bar Demo'
