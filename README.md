@@ -3,7 +3,7 @@
 
 # Color Bar Selector
 
-A simple color choice for your e-commerce store client. Written in Kotlin.
+A simple color choice for your e-commerce store client. Written in Kotlin + coroutines.
 
  - `minSdkVersion 16`
  - AndroidX
@@ -31,64 +31,33 @@ A simple color choice for your e-commerce store client. Written in Kotlin.
 ## XML Layout
 
     <dev.tim4.colorbar.ColorBar
-        android:id="@+id/colorBar"
+        android:id="@+id/colorBar1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        
-        custom:colorBarColumns="@integer/colorbar_columns"
-        custom:iconCircleMarginsDp="@dimen/colorbar_circle_margins"
-        custom:iconCircleSizeDp="@dimen/colorbar_circle_size" 
-    />
 
-## dimensions
-
-    <dimen name="colorbar_circle_size">32dp</dimen>
-    <dimen name="colorbar_circle_margins">2dp</dimen>
-    <integer name="colorbar_columns">5</integer>
+        app:colorBarColumns="5"
+        app:iconCircleMarginsDp="2dp"
+        app:iconCircleSizeDp="32dp" />
 
 ## Kotlin example
 
-    val colors = listOf(
-                ColorCircleData(Color.parseColor("red")),
-                ColorCircleData(Color.parseColor("yellow")),
-                ColorCircleData(Color.parseColor("green"))
-            )
-    colorBar.drawColorBar(colors) { Log.d(TAG, "onClickEvent. data = $colors") }
-    
+    val colors1 = listOf(
+        ColorBarItemData(color = Color.parseColor("red"), tag = 1),
+        ColorBarItemData(color = Color.parseColor("yellow"), tag = 2),
+        ColorBarItemData(color = Color.parseColor("green"), tag = 3, isChecked = true),
+        ColorBarItemData(color = Color.parseColor("blue"), tag = 4),
+        ColorBarItemData(color = Color.parseColor("#3399FF"), tag = 5)
+    )
+    colorBar1.setupColorBar(colors1)
 
-## Java example
+    // NOTE. GlobalScope is used here only as an example app.
+    GlobalScope.launch(Dispatchers.Main) {
+        colorBar1.valueFlow.collect { data ->
+            Log.d(TAG, "collect1 = $data")
+            log1.text = "${data.isChecked}, ${data.tag}"
+        }
+    }
 
-    ColorBar colorBar = findViewById(R.id.colorBar);
-    ArrayList<ColorCircleData> colors = new ArrayList<>();
-    colors.add(new ColorCircleData(Color.parseColor("red"), true));
-    colors.add(new ColorCircleData(Color.parseColor("yellow")));
-    colorBar.drawColorBar(colors, colorData -> Log.d(TAG, "onClickEvent. data = " + colorData.toString()));
-    
 # See also
 
 [A simple text choice for your e-commerce store client. Written in Kotlin.](https://github.com/tim4dev/textbar)
-    
-
-# License
-
-The MIT License
-
-Copyright (c) 2019 tim4dev https://www.tim4.dev
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
