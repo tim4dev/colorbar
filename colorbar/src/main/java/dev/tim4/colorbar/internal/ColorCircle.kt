@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2019 https://www.tim4.dev
+ * Copyright (c) 2019, 2021 https://www.tim4.dev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -32,6 +32,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import dev.tim4.colorbar.ColorBarItemData
 import dev.tim4.colorbar.R
 
 /**
@@ -39,39 +40,48 @@ import dev.tim4.colorbar.R
  */
 class ColorCircle : FrameLayout {
 
-    private val mainView: View = View.inflate(context,
-        R.layout.colorbar_item_view, this)
+    private val layoutId: Int get() = R.layout.colorbar_item_view
+
+    @Suppress("JoinDeclarationAndAssignment")
+    private val layout: View
+
     private lateinit var circleImage: ImageView
     private lateinit var checkImage: ImageView
 
-    private lateinit var colorData: ColorCircleData
+    private lateinit var data: ColorBarItemData
     private var circleSizePx: Int = 0
     private var marginsPx: Int = 0
 
-
+    init {
+        layout = View.inflate(context, layoutId, this)
+        circleImage = findViewById(R.id.colorbarCircle)
+        checkImage = findViewById(R.id.colorbarCircleCheck)
+    }
 
     /**
      * Create an instance programmatically
      */
-    constructor(_context: Context,
-                _colorData: ColorCircleData,
-                _circleSizePx: Int,
-                _marginsPx: Int,
-                _onClickListener: (ColorCircleData) -> Unit = {} // external callback
-    ) : super(_context) {
+    @Suppress("LongParameterList", "MagicNumber")
+    constructor(
+        context: Context,
+        data: ColorBarItemData,
+        circleSizePx: Int,
+        marginsPx: Int,
+        onClickListener: (ColorCircle, ColorBarItemData) -> Unit = { _, _ -> }
+    ) : super(context) {
 
-        this.colorData = _colorData
-        this.circleSizePx = _circleSizePx
-        this.marginsPx = _marginsPx
+        this.data = data.copy()
+        this.circleSizePx = circleSizePx
+        this.marginsPx = marginsPx
 
         initView()
 
         // onclick listener
-        circleImage.setOnClickListener {
-            colorData.isChecked = !colorData.isChecked
-            showChecked()
-            // callback
-            _onClickListener.invoke(colorData)
+        layout.setOnClickListener {
+            val checked = !this.data.isChecked
+            this.data = this.data.copy(isChecked = checked)
+            showChecked(checked)
+            onClickListener.invoke(this, this.data)
         }
     }
 
@@ -85,17 +95,13 @@ class ColorCircle : FrameLayout {
 
     //https://developer.android.com/guide/topics/graphics/drawables
     private fun initView() {
-        // UI
-        circleImage = mainView.findViewById(R.id.colorbarCircle)
-        checkImage = mainView.findViewById(R.id.colorbarCircleCheck)
-
         // set circle color
         val circleDrawable = getDrawable(context, R.drawable.colorbar_circle) as GradientDrawable
-        circleDrawable.setColor(colorData.color)
+        circleDrawable.setColor(data.color)
         circleImage.setImageDrawable(circleDrawable)
 
         // set check
-        val checkDrawable = if (isColorDark(colorData.color)) {
+        val checkDrawable = if (isColorDark(data.color)) {
             // circle - dark color, check - white
             getDrawable(context, R.drawable.colorbar_ic_check_white)
         } else {
@@ -104,11 +110,13 @@ class ColorCircle : FrameLayout {
         }
         checkImage.setImageDrawable(checkDrawable)
 
-        showChecked()
+        showChecked(data.isChecked)
     }
 
-    private fun showChecked() {
-        checkImage.visibility = if (colorData.isChecked) View.VISIBLE else View.GONE
+    fun getData() = data
+
+    private fun showChecked(isChecked: Boolean) {
+        checkImage.visibility = if (isChecked) View.VISIBLE else View.GONE
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -120,13 +128,12 @@ class ColorCircle : FrameLayout {
             layoutParams.width = circleSizePx
             layoutParams.height = circleSizePx
             layoutParams.setMargins(marginsPx, marginsPx, marginsPx, marginsPx)
-            mainView.layoutParams = layoutParams
+            layout.layoutParams = layoutParams
         }
     }
 
-    fun setChecked(checked: Boolean) {
-        colorData.isChecked = checked
-        showChecked()
+    fun toggleChecked(isChecked: Boolean) {
+        data = data.copy(isChecked = isChecked)
+        showChecked(isChecked)
     }
-
 }

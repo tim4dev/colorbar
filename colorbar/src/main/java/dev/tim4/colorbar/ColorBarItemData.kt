@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2019 https://www.tim4.dev
+ * Copyright (c) 2019, 2021 https://www.tim4.dev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,12 @@
  * THE SOFTWARE.
  */
 
-package dev.tim4.colorbar.internal
+package dev.tim4.colorbar
 
 import java.io.Serializable
 
-data class ColorCircleData(
-        val color: Int,
-        var isChecked: Boolean = false
-): Serializable
+data class ColorBarItemData(
+    val color: Int,
+    val isChecked: Boolean = false,
+    val tag: Any? = null
+) : Serializable

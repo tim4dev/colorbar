@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2019 https://www.tim4.dev
+ * Copyright (c) 2019, 2021 https://www.tim4.dev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -30,94 +30,79 @@ import android.util.AttributeSet
 import android.view.View
 import android.widget.TableLayout
 import android.widget.TableRow
+import androidx.core.content.withStyledAttributes
 import dev.tim4.colorbar.internal.ColorCircle
-import dev.tim4.colorbar.internal.ColorCircleData
 import dev.tim4.colorbar.internal.dpToPx
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 /**
  * Create grid of color circles.
  */
-class ColorBar : TableLayout {
+class ColorBar : TableLayout, IColorBar {
+
+    private val layoutId: Int get() = R.layout.colorbar_layout
+
+    private lateinit var _valueFlow: MutableStateFlow<ColorBarItemData>
+    override lateinit var valueFlow: StateFlow<ColorBarItemData>
 
     private var circleSizePx: Int = 0
     private var marginsPx: Int = 0
     private var columns: Int = 0
 
-    //original data
-    var dataList: List<ColorCircleData> = ArrayList()
-    //result checked data
-    private var viewList: MutableList<ColorCircle> = ArrayList()
+    private var childs: MutableList<ColorCircle> = ArrayList()
 
-
+    init {
+        View.inflate(context, layoutId, this)
+    }
 
     constructor(context: Context) : super(context) {
-        initView(null)
+        initLayout(context, null)
     }
 
-    constructor(context: Context, _attrs: AttributeSet) : super(context, _attrs) {
-        initView(_attrs)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
+        initLayout(context, attrs)
     }
 
-    private fun initView(attrs: AttributeSet?) {
-        View.inflate(context, R.layout.colorbar_layout, this)
+    private fun initLayout(context: Context, attrs: AttributeSet?) {
+        context.withStyledAttributes(attrs, R.styleable.ColorBar) {
+            circleSizePx = getDimensionPixelSize(
+                R.styleable.ColorBar_iconCircleSizeDp,
+                CIRCLE_SIZE_DEFAULT_DP.dpToPx
+            )
+            marginsPx = getDimensionPixelSize(
+                R.styleable.ColorBar_iconCircleMarginsDp,
+                MARGINS_DEFAULT_DP.dpToPx
+            )
+            columns = getInteger(
+                R.styleable.ColorBar_colorBarColumns,
+                1
+            )
+        }
 
-        val typedArray = context.theme.obtainStyledAttributes(
-                attrs,
-                R.styleable.ColorBar,
-                0, 0)
-
-        circleSizePx = typedArray.getDimensionPixelSize(R.styleable.ColorBar_iconCircleSizeDp, CIRCLE_SIZE_DEFAULT_DP.dpToPx)
-        marginsPx = typedArray.getDimensionPixelSize(R.styleable.ColorBar_iconCircleMarginsDp, MARGINS_DEFAULT_DP.dpToPx)
-        columns = typedArray.getInteger(
-            R.styleable.ColorBar_colorBarColumns,
-            COLUMNS_COUNT_DEFAULT
-        )
-
-        if (dataList.isEmpty()) stub()
-
-        typedArray.recycle()
+        if (isInEditMode) stub()
     }
 
-    /**
-     * Draw Color Bar
-     * @param colorDataList data
-     */
-    fun drawColorBar(colorDataList: List<ColorCircleData>,
-                     _onClickListener: (ColorCircleData) -> Unit = {} // external callback
-                     ) {
-
+    override fun setupColorBar(dataList: List<ColorBarItemData>) {
         this.removeAllViews()
 
-        this.dataList = colorDataList
-        this.viewList = ArrayList(colorDataList.size)
+        childs = ArrayList(dataList.size)
 
         var countCols = 0
 
         // Fills the table with circles based on the array of colors.
         var row = TableRow(context)
-        for (colorCircleData in colorDataList) {
-
-            val colorView =
-                ColorCircle(
-                    context,
-                    colorCircleData,
-                    circleSizePx,
-                    marginsPx
-                ) { data ->
-                    // radio button behavior
-                    val idx = dataList.indexOf(data)
-                    for (i in dataList.indices) {
-                        if (i != idx) {
-                            dataList[i].isChecked = false
-                            viewList[i].setChecked(false)
-                        }
-                    }
-
-                    // call external callback
-                    _onClickListener.invoke(data)
-                }
-
-            viewList.add(colorView)
+        dataList.forEach { data ->
+            val colorView = ColorCircle(
+                context = context,
+                data = data,
+                circleSizePx = circleSizePx,
+                marginsPx = marginsPx
+            ) { view, data1 ->
+                // onClick
+                emitValue(view, data1)
+            }
+            childs.add(colorView)
 
             row.addView(colorView)
 
@@ -130,46 +115,47 @@ class ColorBar : TableLayout {
                 countCols = 0
             }
         }
-
         addView(row)
+
+        initStateFlow()
+    }
+
+    private fun emitValue(view: ColorCircle, data: ColorBarItemData) {
+        // radio button behavior
+        childs.forEach { child ->
+            if (child != view) {
+                child.toggleChecked(false)
+            } else {
+                child.toggleChecked(data.isChecked)
+            }
+        }
+        // emit
+        _valueFlow.value = data
+    }
+
+    private fun initStateFlow() {
+        val first = childs.find {
+            it.getData().isChecked
+        } ?: childs[0]
+        _valueFlow = MutableStateFlow(first.getData())
+        valueFlow = _valueFlow
     }
 
     private fun stub() {
-        val stubList = ArrayList<ColorCircleData>()
-        stubList.add(ColorCircleData(Color.parseColor("red")))
-        stubList.add(ColorCircleData(Color.parseColor("yellow")))
-        stubList.add(ColorCircleData(Color.parseColor("green")))
-
         val row = TableRow(context)
-        for (stubData in stubList) {
+        repeat((0 until columns).count()) {
             val colorCircle = ColorCircle(
-                context,
-                stubData,
-                circleSizePx,
-                marginsPx
-            ) { /* nothing */ }
+                context = context,
+                data = ColorBarItemData(Color.parseColor("white")),
+                circleSizePx = circleSizePx,
+                marginsPx = marginsPx
+            )
             row.addView(colorCircle)
         }
         addView(row)
     }
 
-    /**
-     * Validate.
-     * @return true if selected
-     */
-    override fun isSelected(): Boolean {
-        var result = false
-        for (data in dataList) {
-            if (data.isChecked) {
-                result = true
-                break
-            }
-        }
-        return result
-    }
-
     companion object {
-        private const val COLUMNS_COUNT_DEFAULT = 5
         private const val CIRCLE_SIZE_DEFAULT_DP = 32
         private const val MARGINS_DEFAULT_DP = 2
     }
