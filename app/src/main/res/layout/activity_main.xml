@@ -39,7 +39,7 @@
         android:layout_height="wrap_content"
         app:colorBarColumns="3"
         app:iconCircleMarginsDp="8dp"
-        app:iconCircleSizeDp="48dp" />
+        app:iconCircleSizeDp="52dp" />
 
     <TextView
         android:id="@+id/textViewLog2"

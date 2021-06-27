@@ -32,6 +32,7 @@ import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.core.view.updateMargins
 import dev.tim4.colorbar.ColorBarItemData
 import dev.tim4.colorbar.R
 
@@ -45,8 +46,8 @@ class ColorCircle : FrameLayout {
     @Suppress("JoinDeclarationAndAssignment")
     private val layout: View
 
-    private lateinit var circleImage: ImageView
-    private lateinit var checkImage: ImageView
+    private val circleImage: ImageView
+    private val checkImage: ImageView
 
     private lateinit var data: ColorBarItemData
     private var circleSizePx: Int = 0
@@ -122,13 +123,20 @@ class ColorCircle : FrameLayout {
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec)
 
+        circleImage.layoutParams.height = circleSizePx
+        circleImage.layoutParams.width = circleSizePx
+
+        checkImage.layoutParams.height = circleSizePx
+        checkImage.layoutParams.width = circleSizePx
+
         // set margins
         if (layoutParams is MarginLayoutParams) {
-            val layoutParams = layoutParams as MarginLayoutParams
-            layoutParams.width = circleSizePx
-            layoutParams.height = circleSizePx
-            layoutParams.setMargins(marginsPx, marginsPx, marginsPx, marginsPx)
-            layout.layoutParams = layoutParams
+            (layoutParams as MarginLayoutParams).updateMargins(
+                left = marginsPx,
+                top = marginsPx,
+                right = marginsPx,
+                bottom = marginsPx
+            )
         }
     }
 
