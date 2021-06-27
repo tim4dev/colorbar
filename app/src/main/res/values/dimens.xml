@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <dimen name="colorbar_circle_size">32dp</dimen>
-    <dimen name="colorbar_circle_margins">2dp</dimen>
-    <integer name="colorbar_columns">5</integer>
-</resources>

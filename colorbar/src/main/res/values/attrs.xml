@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <resources>
-
     <declare-styleable name="ColorBar">
         <attr name="iconCircleSizeDp" format="dimension"/>
         <attr name="iconCircleMarginsDp" format="dimension"/>
         <attr name="colorBarColumns" format="integer"/>
     </declare-styleable>
-
 </resources>

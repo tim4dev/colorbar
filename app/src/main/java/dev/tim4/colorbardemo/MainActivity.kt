@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2019 https://www.tim4.dev
+ * Copyright (c) 2019, 2021 https://www.tim4.dev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy of this software
  * and associated documentation files (the "Software"), to deal in the Software without restriction,
@@ -25,14 +25,16 @@ import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import dev.tim4.colorbar.ColorBar
 import dev.tim4.colorbar.internal.ColorCircleData
-import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        val colorBar1 = findViewById<ColorBar>(R.id.colorBar1)
 
         val colors = listOf(
             ColorCircleData(Color.parseColor("red")),
@@ -41,10 +43,10 @@ class MainActivity : AppCompatActivity() {
             ColorCircleData(Color.parseColor("blue")),
             ColorCircleData(Color.parseColor("magenta"))
         )
-        colorBar.drawColorBar(colors) { Log.d(TAG, "onClickEvent. data = $colors") }
+        colorBar1.drawColorBar(colors) { Log.d(TAG, "onClickEvent. data = $colors") }
     }
 
     companion object {
-        const val TAG = "color bar demo"
+        const val TAG = "MainActivity"
     }
 }

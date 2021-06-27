@@ -59,7 +59,7 @@ class ColorBar : TableLayout {
     }
 
     private fun initView(attrs: AttributeSet?) {
-        View.inflate(context, R.layout.custom_color_bar, this)
+        View.inflate(context, R.layout.colorbar_layout, this)
 
         val typedArray = context.theme.obtainStyledAttributes(
                 attrs,

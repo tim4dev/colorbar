@@ -40,7 +40,7 @@ import dev.tim4.colorbar.R
 class ColorCircle : FrameLayout {
 
     private val mainView: View = View.inflate(context,
-        R.layout.custom_color_circle, this)
+        R.layout.colorbar_item_view, this)
     private lateinit var circleImage: ImageView
     private lateinit var checkImage: ImageView
 
@@ -86,8 +86,8 @@ class ColorCircle : FrameLayout {
     //https://developer.android.com/guide/topics/graphics/drawables
     private fun initView() {
         // UI
-        circleImage = mainView.findViewById(R.id.color_circle)
-        checkImage = mainView.findViewById(R.id.color_circle_check)
+        circleImage = mainView.findViewById(R.id.colorbarCircle)
+        checkImage = mainView.findViewById(R.id.colorbarCircleCheck)
 
         // set circle color
         val circleDrawable = getDrawable(context, R.drawable.colorbar_circle) as GradientDrawable
@@ -97,10 +97,10 @@ class ColorCircle : FrameLayout {
         // set check
         val checkDrawable = if (isColorDark(colorData.color)) {
             // circle - dark color, check - white
-            getDrawable(context, R.drawable.ic_check_white)
+            getDrawable(context, R.drawable.colorbar_ic_check_white)
         } else {
             // circle - light color, check - dark
-            getDrawable(context, R.drawable.ic_check_dark)
+            getDrawable(context, R.drawable.colorbar_ic_check_dark)
         }
         checkImage.setImageDrawable(checkDrawable)
 
